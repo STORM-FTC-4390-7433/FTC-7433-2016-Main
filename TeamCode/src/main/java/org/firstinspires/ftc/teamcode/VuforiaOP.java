@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ThreadPool;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 import com.vuforia.ar.pl.SystemTools;
@@ -52,6 +53,7 @@ public class VuforiaOP extends LinearOpMode {
         int see = 0;
         long lastTime = 0;
         boolean run = false;
+        int state = 0;
         while (opModeIsActive()) {
             for (VuforiaTrackable beac : beacons) {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getPose();
@@ -62,11 +64,41 @@ public class VuforiaOP extends LinearOpMode {
 
                     telemetry.addData(beac.getName() + "-Translation", translation);
 
-                    double degreesToTurn = Math.toDegrees(Math.atan2(translation.get(1), translation.get(2)));
+                    double degreesToTurn = (180 - Math.toDegrees(Math.atan2(translation.get(0), translation.get(2))));
 
                     telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
 
                     telemetry.update();
+
+                    if (state == 0) {
+                        if (degreesToTurn > 5 && degreesToTurn < 180) {
+
+                            leftMotor.setPower(.3);
+                            rightMotor.setPower(-.3);
+
+
+                        } else if (degreesToTurn < 355 && degreesToTurn > 180) {
+
+                            leftMotor.setPower(-.3);
+                            rightMotor.setPower(.3);
+
+                        } else if ((degreesToTurn >= 355 || degreesToTurn <= 5)) {
+
+                            leftMotor.setPower(0);
+                            rightMotor.setPower(0);
+
+                            state = 1;
+
+                        }
+                    }
+
+                    if (state == 1 &&  translation.get(2) < -175) {
+
+                        leftMotor.setPower(.3);
+                        rightMotor.setPower(.3);
+                        Thread.sleep(400);
+                        state = 0;
+                    }
 
 
                    // double zTrans = pose.getTranslation().get(2);
