@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.util.ThreadPool;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
@@ -25,6 +30,11 @@ import java.security.Timestamp;
 public class VuforiaOP extends LinearOpMode {
     //OpenGLMatrix pose = new OpenGLMatrix();
     private DcMotor leftMotor = null, rightMotor = null;
+    private ColorSensor colorSensor;
+    private DeviceInterfaceModule CDI;
+    private float hsvValues[] = {0, 0, 0};
+    private int distanceAdjust = -1000;
+    private boolean adjust = false;
     @Override
     public void runOpMode() throws InterruptedException {
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -43,8 +53,11 @@ public class VuforiaOP extends LinearOpMode {
 
         leftMotor = hardwareMap.dcMotor.get("leftMotor");
         rightMotor = hardwareMap.dcMotor.get("rightMotor");
-        leftMotor.setDirection(DcMotor.Direction.FORWARD);
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        colorSensor = hardwareMap.colorSensor.get("color");
+        CDI = hardwareMap.deviceInterfaceModule.get("Device Interface Module 1");
+        colorSensor.enableLed(false);
+        leftMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightMotor.setDirection(DcMotor.Direction.FORWARD);
 
         waitForStart();
 
@@ -55,6 +68,9 @@ public class VuforiaOP extends LinearOpMode {
         boolean run = false;
         int state = 0;
         while (opModeIsActive()) {
+
+
+
             for (VuforiaTrackable beac : beacons) {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getPose();
 
@@ -70,35 +86,87 @@ public class VuforiaOP extends LinearOpMode {
 
                     telemetry.update();
 
+                    Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
+
+                    telemetry.addData("2 Clear", colorSensor.alpha());
+                    telemetry.addData("3 Red  ", colorSensor.red());
+                    telemetry.addData("4 Green", colorSensor.green());
+                    telemetry.addData("5 Blue ", colorSensor.blue());
+                    telemetry.addData("6 Hue  ", hsvValues[0]);
+
+                    if (colorSensor.red() > colorSensor.blue() || colorSensor.red() > colorSensor.green()) {
+                        leftMotor.setPower(.5);
+                    }
+                    if (colorSensor.blue() > colorSensor.red() || colorSensor.blue() > colorSensor.green()) {
+                        CDI.setLED(1, false);
+                        CDI.setLED(0, true);
+                    }
+                    else{
+                        CDI.setLED(1, false);
+                        CDI.setLED(0, false);
+                    }
+
+
+
                     if (state == 0) {
-                        if (degreesToTurn > 5 && degreesToTurn < 180) {
+                        if (degreesToTurn > 2 && degreesToTurn < 180) {
 
-                            leftMotor.setPower(.3);
-                            rightMotor.setPower(-.3);
+                            leftMotor.setPower(-.15);
+                            rightMotor.setPower(.15);
+                            adjust = false;
 
 
-                        } else if (degreesToTurn < 355 && degreesToTurn > 180) {
+                        } else if (degreesToTurn < 358 && degreesToTurn > 180) {
 
-                            leftMotor.setPower(-.3);
-                            rightMotor.setPower(.3);
+                            leftMotor.setPower(.15);
+                            rightMotor.setPower(-.15);
+                            adjust = false;
 
-                        } else if ((degreesToTurn >= 355 || degreesToTurn <= 5)) {
+                        } else if ((degreesToTurn >= 358 || degreesToTurn <= 2)) {
 
                             leftMotor.setPower(0);
                             rightMotor.setPower(0);
-
+                            adjust = true;
                             state = 1;
 
                         }
+
+                    }
+                    if (state == 1) {
+
+                        if (translation.get(2) < distanceAdjust  && translation.get(2) < -200) {
+                            rightMotor.setPower(.75);
+                            leftMotor.setPower(.75);
+                        }
+                        else if (translation.get(2) > -200 && adjust) {
+                            state = 2;
+                        }
+                        else{
+                            rightMotor.setPower(0);
+                            leftMotor.setPower(0);
+                            distanceAdjust /= 2;
+                            state = 0;
+                            adjust = false;
+                        }
+
                     }
 
-                    if (state == 1 &&  translation.get(2) < -175) {
+                    if (state == 2){
+                        rightMotor.setPower(.25);
+                        leftMotor.setPower(.25);
+                        Thread.sleep(650);
+                        rightMotor.setPower(0);
+                        leftMotor.setPower(0);
+                        state = 4;
+                    }
+
+                    /*if (state == 1 &&  translation.get(2) < -175) {
 
                         leftMotor.setPower(.3);
                         rightMotor.setPower(.3);
                         Thread.sleep(400);
                         state = 0;
-                    }
+                    }/*
 
 
                    // double zTrans = pose.getTranslation().get(2);
