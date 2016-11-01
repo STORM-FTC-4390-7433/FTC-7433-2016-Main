@@ -68,6 +68,12 @@ public class VuforiaOP extends LinearOpMode {
         boolean run = false;
         int state = 0;
         while (opModeIsActive()) {
+            Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
+            telemetry.addData("2 Clear", colorSensor.alpha());
+            telemetry.addData("3 Red  ", colorSensor.red());
+            telemetry.addData("4 Green", colorSensor.green());
+            telemetry.addData("5 Blue ", colorSensor.blue());
+            telemetry.addData("6 Hue  ", hsvValues[0]);
 
 
 
@@ -85,27 +91,6 @@ public class VuforiaOP extends LinearOpMode {
                     telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
 
                     telemetry.update();
-
-                    Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
-
-                    telemetry.addData("2 Clear", colorSensor.alpha());
-                    telemetry.addData("3 Red  ", colorSensor.red());
-                    telemetry.addData("4 Green", colorSensor.green());
-                    telemetry.addData("5 Blue ", colorSensor.blue());
-                    telemetry.addData("6 Hue  ", hsvValues[0]);
-
-                    if (colorSensor.red() > colorSensor.blue() || colorSensor.red() > colorSensor.green()) {
-                        leftMotor.setPower(.5);
-                    }
-                    if (colorSensor.blue() > colorSensor.red() || colorSensor.blue() > colorSensor.green()) {
-                        CDI.setLED(1, false);
-                        CDI.setLED(0, true);
-                    }
-                    else{
-                        CDI.setLED(1, false);
-                        CDI.setLED(0, false);
-                    }
-
 
 
                     if (state == 0) {
@@ -128,9 +113,7 @@ public class VuforiaOP extends LinearOpMode {
                             rightMotor.setPower(0);
                             adjust = true;
                             state = 1;
-
                         }
-
                     }
                     if (state == 1) {
 
@@ -148,62 +131,19 @@ public class VuforiaOP extends LinearOpMode {
                             state = 0;
                             adjust = false;
                         }
-
                     }
 
                     if (state == 2){
                         rightMotor.setPower(.25);
                         leftMotor.setPower(.25);
-                        Thread.sleep(650);
+                        Thread.sleep(850);
                         rightMotor.setPower(0);
                         leftMotor.setPower(0);
-                        state = 4;
+                        state = 3;
                     }
-
-                    /*if (state == 1 &&  translation.get(2) < -175) {
-
-                        leftMotor.setPower(.3);
-                        rightMotor.setPower(.3);
-                        Thread.sleep(400);
-                        state = 0;
-                    }/*
-
-
-                   // double zTrans = pose.getTranslation().get(2);
-                   // if (zTrans < -300) {
-                  //      rightMotor.setPower(.75);
-                   //     leftMotor.setPower(.75);
-                   // }
-                    //else{
-                        /*rightMotor.setPower(0);
-                        leftMotor.setPower(0);
-                    break;*/
-                    //}
                 }
-                /*else {
-
-                    if (System.currentTimeMillis() - lastTime > 1000){
-                        run = !run;
-                        lastTime = System.currentTimeMillis();
-                    }
-                    if (run || System.currentTimeMillis() - lastTime > 500){
-                        leftMotor.setPower(-.30);
-                        rightMotor.setPower(.30);
-                        lastTime = System.currentTimeMillis();
-                        run = !run;
-                    }
-                    telemetry.addData("", "I dont see something" + noSee);
-                    leftMotor.setPower(0);
-                    rightMotor.setPower(0);
-                } */
             }
             telemetry.update();
-            //}
         }
-
-    /*public OpenGLMatrix getPose() {
-        return pose;
-    }
-*/
     }
 }
