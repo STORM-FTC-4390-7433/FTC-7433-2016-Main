@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ThreadPool;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
@@ -30,6 +31,7 @@ import java.security.Timestamp;
 public class VuforiaOP extends LinearOpMode {
     //OpenGLMatrix pose = new OpenGLMatrix();
     private DcMotor leftMotor = null, rightMotor = null;
+    private Servo beaconServo = null;
     private ColorSensor colorSensor;
     private DeviceInterfaceModule CDI;
     private float hsvValues[] = {0, 0, 0};
@@ -53,6 +55,7 @@ public class VuforiaOP extends LinearOpMode {
 
         leftMotor = hardwareMap.dcMotor.get("leftMotor");
         rightMotor = hardwareMap.dcMotor.get("rightMotor");
+        beaconServo = hardwareMap.servo.get("beaconServo");
         colorSensor = hardwareMap.colorSensor.get("color");
         CDI = hardwareMap.deviceInterfaceModule.get("Device Interface Module 1");
         colorSensor.enableLed(false);
@@ -141,6 +144,26 @@ public class VuforiaOP extends LinearOpMode {
                         leftMotor.setPower(0);
                         state = 3;
                     }
+
+                    if (state == 3) {
+                        rightMotor.setPower(-.5);
+                        leftMotor.setPower(-.5);
+                        Thread.sleep(300);
+                        rightMotor.setPower(0);
+                        leftMotor.setPower(0);
+                        if (colorSensor.red() > colorSensor.blue()){
+                            beaconServo.setPosition(.6);
+                            Thread.sleep(400);
+                            beaconServo.setPosition(.5);
+                        }
+                        else if (colorSensor.blue() > colorSensor.red()) {
+                            beaconServo.setPosition(.4);
+                            Thread.sleep(400);
+                            beaconServo.setPosition(.5);
+                        }
+                        state = 4;
+                    }
+
                 }
             }
             telemetry.update();

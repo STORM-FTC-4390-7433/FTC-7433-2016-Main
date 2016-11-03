@@ -8,7 +8,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 
 public class VisionUtil {
 
-    public VisionUtil() {}
+    public VisionUtil() {
+
+    }
 
     public void setTrackables(VuforiaTrackable beacon, boolean pictures[]) {
 
@@ -16,10 +18,16 @@ public class VisionUtil {
 
     }
 
-    public void colorLog(){}
+    public void colorLog(){
 
-    public void visionLog() {}
+    }
 
-    public void motorControl(double i, double j, int sleep) {}
+    public void visionLog() {
+
+    }
+
+    public void motorControl(double i, double j, int sleep) {
+
+    }
 
 }
