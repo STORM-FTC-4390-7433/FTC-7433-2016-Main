@@ -59,8 +59,8 @@ public class VuforiaOP extends LinearOpMode {
         colorSensor = hardwareMap.colorSensor.get("color");
         CDI = hardwareMap.deviceInterfaceModule.get("Device Interface Module 1");
         colorSensor.enableLed(false);
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
 
@@ -162,6 +162,15 @@ public class VuforiaOP extends LinearOpMode {
                             beaconServo.setPosition(.5);
                         }
                         state = 4;
+                    }
+
+                    if (state == 5) {
+                        leftMotor.setPower(.75);
+                        rightMotor.setPower(.75);
+                        Thread.sleep(400);
+                        leftMotor.setPower(0);
+                        rightMotor.setPower(0);
+                        state = 6;
                     }
 
                 }

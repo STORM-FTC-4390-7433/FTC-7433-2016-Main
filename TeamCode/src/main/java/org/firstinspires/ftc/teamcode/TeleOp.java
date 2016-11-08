@@ -37,17 +37,16 @@ public class TeleOp extends OpMode {
     public void loop() {
         float throttleLeft = -gamepad1.left_stick_y;
         float throttleRight = -gamepad1.right_stick_y;
-        //float shooterPower = -gamepad2.left_stick_y;
+        float shooterPower = -gamepad2.left_stick_y;
         //float sweepconveyPower = gamepad2.right_stick_y;
-        float shooterPower;
-        float sweepconveyPower = 0;
+        float sweepconveyPower;
 
-        if(gamepad2.x)
-            shooterPower = 1;
-        else if(gamepad2.b)
-            shooterPower = -1;
-        else
-            shooterPower = 0;
+//        if(gamepad2.x)
+//            shooterPower = 1;
+//        else if(gamepad2.b)
+//            shooterPower = -1;
+//        else
+//            shooterPower = 0;
 
         if(gamepad2.y)
             sweepconveyPower = 1;
@@ -56,7 +55,7 @@ public class TeleOp extends OpMode {
         else
             sweepconveyPower = 0;
 
-        //shooterPower = Range.clip(shooterPower, -1, 1);
+        shooterPower = Range.clip(shooterPower, -1, 1);
         //sweepconveyPower = Range.clip(sweepconveyPower, -1, 1);
         throttleRight = Range.clip(throttleRight, -1, 1);
         throttleLeft = Range.clip(throttleLeft, -1, 1);
