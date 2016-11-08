@@ -164,13 +164,13 @@ public class VuforiaOP extends LinearOpMode {
                         state = 4;
                     }
 
-                    if (state == 5) {
+                    if (state == 4) {
                         leftMotor.setPower(.75);
                         rightMotor.setPower(.75);
                         Thread.sleep(400);
                         leftMotor.setPower(0);
                         rightMotor.setPower(0);
-                        state = 6;
+                        state = 5;
                     }
 
                 }
