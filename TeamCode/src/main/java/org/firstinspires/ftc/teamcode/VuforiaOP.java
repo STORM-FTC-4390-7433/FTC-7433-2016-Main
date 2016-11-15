@@ -37,6 +37,7 @@ public class VuforiaOP extends LinearOpMode {
     private float hsvValues[] = {0, 0, 0};
     private int distanceAdjust = -1000;
     private boolean adjust = false;
+    private String color = "blue";
     @Override
     public void runOpMode() throws InterruptedException {
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -151,15 +152,11 @@ public class VuforiaOP extends LinearOpMode {
                         Thread.sleep(300);
                         rightMotor.setPower(0);
                         leftMotor.setPower(0);
-                        if (colorSensor.red() > colorSensor.blue()){
-                            beaconServo.setPosition(.6);
-                            Thread.sleep(400);
-                            beaconServo.setPosition(.5);
+                        if (colorSensor.red() > colorSensor.blue() && color == "blue"){
+                            beaconServo.setPosition(.8);
                         }
-                        else if (colorSensor.blue() > colorSensor.red()) {
-                            beaconServo.setPosition(.4);
-                            Thread.sleep(400);
-                            beaconServo.setPosition(.5);
+                        else if (colorSensor.blue() > colorSensor.red() && color == "blue") {
+                            beaconServo.setPosition(.1);
                         }
                         state = 4;
                     }
@@ -167,7 +164,7 @@ public class VuforiaOP extends LinearOpMode {
                     if (state == 4) {
                         leftMotor.setPower(.75);
                         rightMotor.setPower(.75);
-                        Thread.sleep(400);
+                        Thread.sleep(800);
                         leftMotor.setPower(0);
                         rightMotor.setPower(0);
                         state = 5;
