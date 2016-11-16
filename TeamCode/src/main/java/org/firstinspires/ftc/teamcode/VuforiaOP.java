@@ -48,12 +48,6 @@ public class VuforiaOP extends LinearOpMode {
         VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
 
-        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
-        beacons.get(0).setName("Wheels");
-        beacons.get(1).setName("Tools");
-        beacons.get(2).setName("Lego");
-        beacons.get(3).setName("Gears");
-
         leftMotor = hardwareMap.dcMotor.get("leftMotor");
         rightMotor = hardwareMap.dcMotor.get("rightMotor");
         beaconServo = hardwareMap.servo.get("beaconServo");
@@ -64,115 +58,113 @@ public class VuforiaOP extends LinearOpMode {
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
-
         beacons.activate();
-        int noSee = 0;
-        int see = 0;
+        startAuto(startPosition); //1 = far Blue, 2 = close Blue, 3 = far Red, 4 = close Red
+    }
+
+    public void startAuto(int startPos) {
         long lastTime = 0;
         boolean run = false;
         int state = 0;
+        boolean beaconCapped[4];
+        boolean switchTarget;
+
+        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
+        beacons.get(0).setName("Wheels");
+        beacons.get(1).setName("Tools");
+        beacons.get(2).setName("Lego");
+        beacons.get(3).setName("Gears");
+
         while (opModeIsActive()) {
             Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
-            telemetry.addData("2 Clear", colorSensor.alpha());
-            telemetry.addData("3 Red  ", colorSensor.red());
-            telemetry.addData("4 Green", colorSensor.green());
-            telemetry.addData("5 Blue ", colorSensor.blue());
-            telemetry.addData("6 Hue  ", hsvValues[0]);
+            telem();
+            VuforiaTrackable target;
 
+            for(int i = 0; i < beacons.size(); i++) {
+                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beacons.get(i).getListener()).getPose();
 
+                if (pose != null && switchTarget && !beaconCapped[i]) {
+                    target = beacons.get(i);
+                    switchTarget = false;
+                }
+            }
 
-            for (VuforiaTrackable beac : beacons) {
-                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getPose();
+            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) target.getListener()).getPose();
 
-                if (pose != null) {
+            if (pose != null) {
+                VectorF translation = pose.getTranslation();
+                telem2();
+                double degreesToTurn = (180 - Math.toDegrees(Math.atan2(translation.get(0), translation.get(2))));
 
-                    VectorF translation = pose.getTranslation();
-
-                    telemetry.addData(beac.getName() + "-Translation", translation);
-
-                    double degreesToTurn = (180 - Math.toDegrees(Math.atan2(translation.get(0), translation.get(2))));
-
-                    telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
-
-                    telemetry.update();
-
-
-                    if (state == 0) {
-                        if (degreesToTurn > 2 && degreesToTurn < 180) {
-
-                            leftMotor.setPower(-.15);
-                            rightMotor.setPower(.15);
-                            adjust = false;
-
-
-                        } else if (degreesToTurn < 358 && degreesToTurn > 180) {
-
-                            leftMotor.setPower(.15);
-                            rightMotor.setPower(-.15);
-                            adjust = false;
-
-                        } else if ((degreesToTurn >= 358 || degreesToTurn <= 2)) {
-
-                            leftMotor.setPower(0);
-                            rightMotor.setPower(0);
-                            adjust = true;
-                            state = 1;
-                        }
+                if (state == 0) {
+                    if (degreesToTurn > 2 && degreesToTurn < 180) {
+                        drive(-.15, .15, 0);
+                        adjust = false;
+                    } else if (degreesToTurn < 358 && degreesToTurn > 180) {
+                        drive(.15, -.15, 0);
+                        adjust = false;
+                    } else if ((degreesToTurn >= 358 || degreesToTurn <= 2)) {
+                        drive(0, 0, 0);
+                        adjust = true;
+                        state = 1;
                     }
-                    if (state == 1) {
-
-                        if (translation.get(2) < distanceAdjust  && translation.get(2) < -200) {
-                            rightMotor.setPower(.75);
-                            leftMotor.setPower(.75);
-                        }
-                        else if (translation.get(2) > -200 && adjust) {
-                            state = 2;
-                        }
-                        else{
-                            rightMotor.setPower(0);
-                            leftMotor.setPower(0);
-                            distanceAdjust /= 2;
-                            state = 0;
-                            adjust = false;
-                        }
+                } else if (state == 1) {
+                    if (translation.get(2) < distanceAdjust && translation.get(2) < -200) {
+                        drive(.75, .75, 0);
+                    } else if (translation.get(2) > -200 && adjust) {
+                        state = 2;
+                    } else {
+                        drive(0, 0, 0);
+                        distanceAdjust /= 2;
+                        state = 0;
+                        adjust = false;
                     }
-
-                    if (state == 2){
-                        rightMotor.setPower(.25);
-                        leftMotor.setPower(.25);
-                        Thread.sleep(850);
-                        rightMotor.setPower(0);
-                        leftMotor.setPower(0);
-                        state = 3;
+                } else if (state == 2) {
+                    drive(.25, .25, 850);
+                    drive(0, 0, 0);
+                    state = 3;
+                } else if (state == 3) {
+                    drive(-.5, -.5, 300);
+                    drive(0, 0, 0);
+                    if (colorSensor.red() > colorSensor.blue() && color == "blue") {
+                        beaconServo.setPosition(.8);
+                    } else if (colorSensor.blue() > colorSensor.red() && color == "blue") {
+                        beaconServo.setPosition(.1);
                     }
-
-                    if (state == 3) {
-                        rightMotor.setPower(-.5);
-                        leftMotor.setPower(-.5);
-                        Thread.sleep(300);
-                        rightMotor.setPower(0);
-                        leftMotor.setPower(0);
-                        if (colorSensor.red() > colorSensor.blue() && color == "blue"){
-                            beaconServo.setPosition(.8);
-                        }
-                        else if (colorSensor.blue() > colorSensor.red() && color == "blue") {
-                            beaconServo.setPosition(.1);
-                        }
-                        state = 4;
-                    }
-
-                    if (state == 4) {
-                        leftMotor.setPower(.75);
-                        rightMotor.setPower(.75);
-                        Thread.sleep(800);
-                        leftMotor.setPower(0);
-                        rightMotor.setPower(0);
-                        state = 5;
-                    }
-
+                    state = 4;
+                } else if (state == 4) {
+                    drive(.75, .75, 800);
+                    drive(0, 0, 0);
+                    state = 5;
+                } else if (state == 5) {
+                    drive(-.75, -.75, 1600);
+                    drive(0, 0, 0);
+                    state = 1;
+                    switchTarget = true;
                 }
             }
             telemetry.update();
         }
     }
+
+    public void drive(int powerLeft, int powerRight, int duration){
+        leftMotor.setPower(powerLeft);
+        rightMotor.setPower(powerRight);
+        Thread.sleep(duration);
+    }
+
+    public void telem(){
+        telemetry.addData("2 Clear", colorSensor.alpha());
+        telemetry.addData("3 Red  ", colorSensor.red());
+        telemetry.addData("4 Green", colorSensor.green());
+        telemetry.addData("5 Blue ", colorSensor.blue());
+        telemetry.addData("6 Hue  ", hsvValues[0]);
+    }
+
+    public void telem2(){
+        telemetry.addData(beac.getName() + "-Translation", translation);
+        telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
+        telemetry.update();
+    }
+
 }
