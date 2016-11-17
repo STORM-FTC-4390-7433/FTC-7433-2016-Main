@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+
 import android.graphics.Color;
+
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,6 +16,7 @@ import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 import com.vuforia.ar.pl.SystemTools;
 
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -22,7 +25,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+
 import java.security.Timestamp;
+
 
 /**
  * Created by grego on 10/18/2016.
@@ -45,8 +50,10 @@ public class VuforiaOP extends LinearOpMode {
         params.vuforiaLicenseKey = "ATL2vJ3/////AAAAGZZx51v2h0D2kh6vX9dkEVwwXavfMtPW74LnE7NWXWw2NChN8Td99tPKhECwV61l/fTsgxV43ktU6XBUlR9lZn1Z3BEd7nQPD+s4uscCWDSjTpXDdQZZWVD7Cfmp+ZK8ax49W55s1vC6mX3vED8miPeegc8DR1bT2BtjxLa0cD77nbeVN5ztUzZEGKPTZEhxGoxjqQsKOEUktyLo6NZIRTA5uEhOmVuwVWC1Iq49tfbjKnLe7t1qfzQlB6wri9DPUrtt3YeuyrNERLclghW7fz7GrfWooMfQIaNEbu/E7BhY95CDGy/Srl1ZpvingaBdcfpB7MAQ/+bFw93saY/lYwT7MXu9ctO9zv1rmuFEAJFp";
         params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
 
+
         VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
+
 
         leftMotor = hardwareMap.dcMotor.get("leftMotor");
         rightMotor = hardwareMap.dcMotor.get("rightMotor");
@@ -57,31 +64,36 @@ public class VuforiaOP extends LinearOpMode {
         leftMotor.setDirection(DcMotor.Direction.FORWARD);
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        waitForStart();
-        beacons.activate();
-        startAuto(startPosition); //1 = far Blue, 2 = close Blue, 3 = far Red, 4 = close Red
-    }
 
-    public void startAuto(int startPos) {
+        waitForStart();
+
+
+
+
         long lastTime = 0;
         boolean run = false;
         int state = 0;
-        boolean beaconCapped[4];
-        boolean switchTarget;
+        boolean[] beaconCapped = new boolean[4];
+        boolean switchTarget = true;
+
 
         VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
+        beacons.activate();
         beacons.get(0).setName("Wheels");
         beacons.get(1).setName("Tools");
         beacons.get(2).setName("Lego");
         beacons.get(3).setName("Gears");
 
+
         while (opModeIsActive()) {
             Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
             telem();
-            VuforiaTrackable target;
+            VuforiaTrackable target = null;
+
 
             for(int i = 0; i < beacons.size(); i++) {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beacons.get(i).getListener()).getPose();
+
 
                 if (pose != null && switchTarget && !beaconCapped[i]) {
                     target = beacons.get(i);
@@ -89,12 +101,15 @@ public class VuforiaOP extends LinearOpMode {
                 }
             }
 
+
             OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) target.getListener()).getPose();
+
 
             if (pose != null) {
                 VectorF translation = pose.getTranslation();
                 telem2();
                 double degreesToTurn = (180 - Math.toDegrees(Math.atan2(translation.get(0), translation.get(2))));
+
 
                 if (state == 0) {
                     if (degreesToTurn > 2 && degreesToTurn < 180) {
@@ -147,11 +162,16 @@ public class VuforiaOP extends LinearOpMode {
         }
     }
 
-    public void drive(int powerLeft, int powerRight, int duration){
+
+    public void drive(double powerLeft, double powerRight, int duration){
         leftMotor.setPower(powerLeft);
         rightMotor.setPower(powerRight);
-        Thread.sleep(duration);
+        try {
+            Thread.sleep(duration);
+        } catch (InterruptedException ex) {
+        }
     }
+
 
     public void telem(){
         telemetry.addData("2 Clear", colorSensor.alpha());
@@ -161,10 +181,14 @@ public class VuforiaOP extends LinearOpMode {
         telemetry.addData("6 Hue  ", hsvValues[0]);
     }
 
+
     public void telem2(){
-        telemetry.addData(beac.getName() + "-Translation", translation);
-        telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
+        //telemetry.addData(beac.getName() + "-Translation", translation);
+        //telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
         telemetry.update();
     }
 
+
 }
+
+
