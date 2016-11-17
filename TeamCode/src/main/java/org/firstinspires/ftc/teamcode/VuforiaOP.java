@@ -101,8 +101,10 @@ public class VuforiaOP extends LinearOpMode {
                 }
             }
 
-
-            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) target.getListener()).getPose();
+            OpenGLMatrix pose = null;
+            if(target != null){
+                pose = ((VuforiaTrackableDefaultListener) target.getListener()).getPose();
+            }
 
 
             if (pose != null) {
