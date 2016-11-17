@@ -158,6 +158,10 @@ public class VuforiaOP extends LinearOpMode {
                     drive(0, 0, 0);
                     state = 1;
                     switchTarget = true;
+                } else if(state == 6){
+                    drive(-.75, .75, 500);
+                    drive(0, 0, 0);
+
                 }
             }
             telemetry.update();
