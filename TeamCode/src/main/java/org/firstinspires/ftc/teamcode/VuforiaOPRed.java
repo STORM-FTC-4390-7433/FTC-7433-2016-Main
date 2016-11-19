@@ -32,6 +32,7 @@ import java.security.Timestamp;
 @Autonomous(name="visionRed", group="Vision")
 public class VuforiaOPRed extends LinearOpMode {
     private DcMotor leftMotor = null, rightMotor = null;
+    boolean hardCode = true;
     private Servo beaconServo = null;
     private ColorSensor colorSensor;
     private DeviceInterfaceModule CDI;
@@ -39,6 +40,10 @@ public class VuforiaOPRed extends LinearOpMode {
     private int distanceAdjust = -1000;
     private boolean adjust = false;
     private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor shooterLeft = null;
+    private DcMotor shooterRight = null;
+    private DcMotor sweeper = null;
+    private DcMotor conveyor = null;
 
     static final double     COUNTS_PER_MOTOR_REV    = 1368 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
@@ -74,6 +79,14 @@ public class VuforiaOPRed extends LinearOpMode {
         colorSensor.enableLed(false);
         leftMotor.setDirection(DcMotor.Direction.FORWARD);
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        shooterLeft = hardwareMap.dcMotor.get("shooterLeft");
+        shooterRight = hardwareMap.dcMotor.get("shooterRight");
+        sweeper = hardwareMap.dcMotor.get("sweeper");
+        conveyor = hardwareMap.dcMotor.get("conveyor");
+        shooterRight.setDirection(DcMotor.Direction.REVERSE);
+        shooterLeft.setDirection(DcMotor.Direction.FORWARD);
+        sweeper.setDirection(DcMotor.Direction.REVERSE);
+        conveyor.setDirection(DcMotor.Direction.FORWARD);
 
         waitForStart();
 
@@ -84,7 +97,7 @@ public class VuforiaOPRed extends LinearOpMode {
         boolean run = false;
         int state = 0;
 
-        boolean hardCode = true;
+
         if(hardCode){
             telemetry.addData("Status", "Resetting Encoders");    //
             telemetry.update();
@@ -188,8 +201,8 @@ public class VuforiaOPRed extends LinearOpMode {
                     }
 
                     if (state == 2){
-                        rightMotor.setPower(.25);
-                        leftMotor.setPower(.25);
+                        rightMotor.setPower(5);
+                        leftMotor.setPower(5);
                         Thread.sleep(850);
                         rightMotor.setPower(0);
                         leftMotor.setPower(0);
@@ -203,21 +216,47 @@ public class VuforiaOPRed extends LinearOpMode {
                         rightMotor.setPower(0);
                         leftMotor.setPower(0);
                         if (colorSensor.red() > colorSensor.blue()){
-                            beaconServo.setPosition(.1);
+                            beaconServo.setPosition(.15);
                         }
                         else if (colorSensor.blue() > colorSensor.red()) {
-                            beaconServo.setPosition(.8);
+                            beaconServo.setPosition(.75);
                         }
                         state = 4;
                     }
 
                     if (state == 4) {
-                        leftMotor.setPower(.75);
-                        rightMotor.setPower(.75);
-                        Thread.sleep(800);
+                        leftMotor.setPower(1);
+                        rightMotor.setPower(1);
+                        Thread.sleep(1200);
                         leftMotor.setPower(0);
                         rightMotor.setPower(0);
                         state = 5;
+                    }
+
+                    if (state == 5) {
+                        Thread.sleep(1500);
+                        state = 6;
+                    }
+
+                    if (state == 6){
+                        leftMotor.setPower(-5);
+                        rightMotor.setPower(-5);
+                        Thread.sleep(500);
+                        leftMotor.setPower(0);
+                        rightMotor.setPower(0);
+                        state = 7;
+                    }
+
+                    if (state == 7){
+                        shooterLeft.setPower(1);
+                        shooterRight.setPower(1);
+                        Thread.sleep(2000);
+                        conveyor.setPower(-1);
+                        Thread.sleep(3000);
+                        shooterLeft.setPower(0);
+                        shooterRight.setPower(0);
+                        conveyor.setPower(0);
+                        state = 8;
                     }
 
                 }
