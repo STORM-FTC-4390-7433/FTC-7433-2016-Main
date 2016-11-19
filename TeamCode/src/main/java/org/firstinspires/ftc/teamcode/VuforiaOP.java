@@ -6,13 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ThreadPool;
+
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
-import com.vuforia.ar.pl.SystemTools;
+
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -33,14 +33,13 @@ public class VuforiaOP extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        private DcMotor leftMotor = null, rightMotor = null;
-        private Servo beaconServo = null;
-        private ColorSensor colorSensor;
-        private DeviceInterfaceModule CDI;
-        private float hsvValues[] = {0, 0, 0};
-        private int distanceAdjust = -1000;
-        private boolean adjust = false;
-        private String color = "blue";
+        DcMotor leftMotor = null, rightMotor = null;
+        Servo beaconServo = null;
+        ColorSensor colorSensor;
+        DeviceInterfaceModule CDI;
+        float hsvValues[] = {0, 0, 0};
+        int distanceAdjust = -1000;
+        boolean adjust = false;
         
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
@@ -154,10 +153,10 @@ public class VuforiaOP extends LinearOpMode {
                         Thread.sleep(300);
                         rightMotor.setPower(0);
                         leftMotor.setPower(0);
-                        if (colorSensor.red() > colorSensor.blue() && color == "blue"){
+                        if (colorSensor.red() > colorSensor.blue()){
                             beaconServo.setPosition(.8);
                         }
-                        else if (colorSensor.blue() > colorSensor.red() && color == "blue") {
+                        else if (colorSensor.blue() > colorSensor.red()) {
                             beaconServo.setPosition(.1);
                         }
                         state = 4;
