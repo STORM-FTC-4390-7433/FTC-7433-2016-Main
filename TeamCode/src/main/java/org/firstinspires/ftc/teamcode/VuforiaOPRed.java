@@ -29,7 +29,7 @@ import java.security.Timestamp;
 /**
  * Created by grego on 10/18/2016.
  */
-@Autonomous(name="vision", group="Vision")
+@Autonomous(name="visionRed", group="Vision")
 public class VuforiaOPRed extends LinearOpMode {
     private DcMotor leftMotor = null, rightMotor = null;
     private Servo beaconServo = null;
@@ -82,7 +82,28 @@ public class VuforiaOPRed extends LinearOpMode {
         int see = 0;
         long lastTime = 0;
         boolean run = false;
-        int state = -1;
+        int state = 0;
+
+        boolean hardCode = true;
+        if(hardCode){
+            telemetry.addData("Status", "Resetting Encoders");    //
+            telemetry.update();
+            leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            idle();
+            leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            telemetry.addData("Path0", "Starting at %7d :%7d",
+                    leftMotor.getCurrentPosition(),
+                    rightMotor.getCurrentPosition());
+            telemetry.update();
+            encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+            encoderDrive(TURN_SPEED, 14.8, -14.8, 1.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+            encoderDrive(DRIVE_SPEED, 12, 12, 1.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+
+            hardCode = false;
+        }
+
         while (opModeIsActive()) {
             Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
             telemetry.addData("2 Clear", colorSensor.alpha());
