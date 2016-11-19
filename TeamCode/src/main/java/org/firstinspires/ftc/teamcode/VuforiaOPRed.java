@@ -123,6 +123,7 @@ public class VuforiaOPRed extends LinearOpMode {
                         encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
                         encoderDrive(TURN_SPEED, 14.8, -14.8, 1.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
                         encoderDrive(DRIVE_SPEED, 12, 12, 1.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+                        state = 0;
                     }
 
                     if (state == 0) {
