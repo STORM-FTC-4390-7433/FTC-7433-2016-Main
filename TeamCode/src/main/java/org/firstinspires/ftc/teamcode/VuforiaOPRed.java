@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import android.graphics.Color;
-
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -17,7 +15,6 @@ import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 
 
-
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -27,9 +24,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-
 import java.security.Timestamp;
-
 
 /**
  * Created by grego on 10/18/2016.
@@ -67,10 +62,14 @@ public class VuforiaOPRed extends LinearOpMode {
         params.vuforiaLicenseKey = "ATL2vJ3/////AAAAGZZx51v2h0D2kh6vX9dkEVwwXavfMtPW74LnE7NWXWw2NChN8Td99tPKhECwV61l/fTsgxV43ktU6XBUlR9lZn1Z3BEd7nQPD+s4uscCWDSjTpXDdQZZWVD7Cfmp+ZK8ax49W55s1vC6mX3vED8miPeegc8DR1bT2BtjxLa0cD77nbeVN5ztUzZEGKPTZEhxGoxjqQsKOEUktyLo6NZIRTA5uEhOmVuwVWC1Iq49tfbjKnLe7t1qfzQlB6wri9DPUrtt3YeuyrNERLclghW7fz7GrfWooMfQIaNEbu/E7BhY95CDGy/Srl1ZpvingaBdcfpB7MAQ/+bFw93saY/lYwT7MXu9ctO9zv1rmuFEAJFp";
         params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
 
-
         VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
 
+        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
+        beacons.get(0).setName("Wheels");
+        beacons.get(1).setName("Tools");
+        beacons.get(2).setName("Lego");
+        beacons.get(3).setName("Gears");
 
         leftMotor = hardwareMap.dcMotor.get("leftMotor");
         rightMotor = hardwareMap.dcMotor.get("rightMotor");
@@ -88,7 +87,6 @@ public class VuforiaOPRed extends LinearOpMode {
         shooterLeft.setDirection(DcMotor.Direction.FORWARD);
         sweeper.setDirection(DcMotor.Direction.REVERSE);
         conveyor.setDirection(DcMotor.Direction.FORWARD);
-
 
         waitForStart();
 
@@ -127,52 +125,63 @@ public class VuforiaOPRed extends LinearOpMode {
             telemetry.addData("5 Blue ", colorSensor.blue());
             telemetry.addData("6 Hue  ", hsvValues[0]);
 
-        waitForStart();
 
 
+            for (VuforiaTrackable beac : beacons) {
+                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getPose();
 
+                if (pose != null) {
 
-        long lastTime = 0;
-        boolean run = false;
-        int state = 0;
-        boolean[] beaconCapped = new boolean[4];
-        boolean switchTarget = true;
+                    VectorF translation = pose.getTranslation();
 
+                    telemetry.addData(beac.getName() + "-Translation", translation);
 
-        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
-        beacons.activate();
-        beacons.get(0).setName("Wheels");
-        beacons.get(1).setName("Tools");
-        beacons.get(2).setName("Lego");
-        beacons.get(3).setName("Gears");
+                    double degreesToTurn = (180 - Math.toDegrees(Math.atan2(translation.get(0), translation.get(2))));
 
+                    telemetry.addData(beac.getName() + "-Degrees", degreesToTurn);
 
-        while (opModeIsActive()) {
-            Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
-            telem();
-            VuforiaTrackable target = null;
+                    telemetry.update();
 
                     if (state == 0) {
                         if (degreesToTurn > 2 && degreesToTurn < 180) {
 
+                            leftMotor.setPower(-.15);
+                            rightMotor.setPower(.15);
+                            adjust = false;
 
 
-                if (pose != null && switchTarget && !beaconCapped[i]) {
-                    target = beacons.get(i);
-                    switchTarget = false;
-                }
-            }
+                        } else if (degreesToTurn < 358 && degreesToTurn > 180) {
 
-            OpenGLMatrix pose = null;
-            if(target != null){
-                pose = ((VuforiaTrackableDefaultListener) target.getListener()).getPose();
-            }
+                            leftMotor.setPower(.15);
+                            rightMotor.setPower(-.15);
+                            adjust = false;
 
+                        } else if ((degreesToTurn >= 358 || degreesToTurn <= 2)) {
 
-            if (pose != null) {
-                VectorF translation = pose.getTranslation();
-                telem2();
-                double degreesToTurn = (180 - Math.toDegrees(Math.atan2(translation.get(0), translation.get(2))));
+                            leftMotor.setPower(0);
+                            rightMotor.setPower(0);
+                            adjust = true;
+                            state = 1;
+                        }
+                    }
+                    if (state == 1) {
+
+                        if (translation.get(2) < distanceAdjust  && translation.get(2) < -200) {
+                            rightMotor.setPower(.75);
+                            leftMotor.setPower(.75);
+                        }
+                        else if (translation.get(2) > -200 && adjust) {
+                            state = 2;
+                        }
+                        else{
+                            rightMotor.setPower(0);
+                            leftMotor.setPower(0);
+                            distanceAdjust /= 2;
+                            state = 0;
+                            adjust = false;
+                        }
+                    }
+
                     if (state == 2){
                         rightMotor.setPower(5);
                         leftMotor.setPower(5);
@@ -205,19 +214,6 @@ public class VuforiaOPRed extends LinearOpMode {
                         rightMotor.setPower(0);
                         state = 5;
                     }
-                    state = 4;
-                } else if (state == 4) {
-                    drive(.75, .75, 800);
-                    drive(0, 0, 0);
-                    state = 5;
-                } else if (state == 5) {
-                    drive(-.75, -.75, 1600);
-                    drive(0, 0, 0);
-                    state = 1;
-                    switchTarget = true;
-                } else if(state == 6){
-                    drive(-.75, .75, 500);
-                    drive(0, 0, 0);
 
                     if (state == 5) {
                         Thread.sleep(1500);
