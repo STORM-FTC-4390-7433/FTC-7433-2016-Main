@@ -110,7 +110,7 @@ public class VuforiaOPRed extends LinearOpMode {
                     leftMotor.getCurrentPosition(),
                     rightMotor.getCurrentPosition());
             telemetry.update();
-            encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+            encoderDrive(DRIVE_SPEED, 25, 25, 6.0);  // S1: Forward 47 Inches with 5 Sec timeout
             encoderDrive(TURN_SPEED, 14.8, -14.8, 1.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
             encoderDrive(DRIVE_SPEED, 12, 12, 1.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
@@ -145,15 +145,15 @@ public class VuforiaOPRed extends LinearOpMode {
                     if (state == 0) {
                         if (degreesToTurn > 2 && degreesToTurn < 180) {
 
-                            leftMotor.setPower(-.15);
-                            rightMotor.setPower(.15);
+                            leftMotor.setPower(.15);
+                            rightMotor.setPower(-.15);
                             adjust = false;
 
 
                         } else if (degreesToTurn < 358 && degreesToTurn > 180) {
 
-                            leftMotor.setPower(.15);
-                            rightMotor.setPower(-.15);
+                            leftMotor.setPower(-.15);
+                            rightMotor.setPower(.15);
                             adjust = false;
 
                         } else if ((degreesToTurn >= 358 || degreesToTurn <= 2)) {
@@ -223,15 +223,15 @@ public class VuforiaOPRed extends LinearOpMode {
                     if (state == 6){
                         leftMotor.setPower(-5);
                         rightMotor.setPower(-5);
-                        Thread.sleep(500);
+                        Thread.sleep(300);
                         leftMotor.setPower(0);
                         rightMotor.setPower(0);
                         state = 7;
                     }
 
                     if (state == 7){
-                        shooterLeft.setPower(1);
-                        shooterRight.setPower(1);
+                        shooterLeft.setPower(.9);
+                        shooterRight.setPower(.9);
                         Thread.sleep(2000);
                         conveyor.setPower(-1);
                         Thread.sleep(3000);

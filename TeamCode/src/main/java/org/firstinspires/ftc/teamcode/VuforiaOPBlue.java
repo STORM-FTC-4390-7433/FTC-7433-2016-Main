@@ -58,7 +58,7 @@ public class VuforiaOPBlue extends LinearOpMode {
 
         
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-        params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        params.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         params.vuforiaLicenseKey = "ATL2vJ3/////AAAAGZZx51v2h0D2kh6vX9dkEVwwXavfMtPW74LnE7NWXWw2NChN8Td99tPKhECwV61l/fTsgxV43ktU6XBUlR9lZn1Z3BEd7nQPD+s4uscCWDSjTpXDdQZZWVD7Cfmp+ZK8ax49W55s1vC6mX3vED8miPeegc8DR1bT2BtjxLa0cD77nbeVN5ztUzZEGKPTZEhxGoxjqQsKOEUktyLo6NZIRTA5uEhOmVuwVWC1Iq49tfbjKnLe7t1qfzQlB6wri9DPUrtt3YeuyrNERLclghW7fz7GrfWooMfQIaNEbu/E7BhY95CDGy/Srl1ZpvingaBdcfpB7MAQ/+bFw93saY/lYwT7MXu9ctO9zv1rmuFEAJFp";
         params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
 
@@ -99,7 +99,7 @@ public class VuforiaOPBlue extends LinearOpMode {
 
 
 
-        if(hardCode){
+        if(hardCode == true){
             telemetry.addData("Status", "Resetting Encoders");    //
             telemetry.update();
             leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -111,9 +111,9 @@ public class VuforiaOPBlue extends LinearOpMode {
                     leftMotor.getCurrentPosition(),
                     rightMotor.getCurrentPosition());
             telemetry.update();
-            encoderDrive(DRIVE_SPEED, 25, 25, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-            encoderDrive(TURN_SPEED, -30, 30, 1.5);  // S2: Turn Right 12 Inches with 4 Sec timeout
-            encoderDrive(DRIVE_SPEED, 12, 12, 1.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+            encoderDrive(DRIVE_SPEED, 30, 30, 6.0);  // S1: Forward 47 Inches with 5 Sec timeout
+            encoderDrive(TURN_SPEED, -40, 40, 2.2);  // S2: Turn Right 12 Inches with 4 Sec timeout
+            encoderDrive(DRIVE_SPEED, 18, 18, 3.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
             hardCode = false;
         }
@@ -146,15 +146,15 @@ public class VuforiaOPBlue extends LinearOpMode {
                     if (state == 0) {
                         if (degreesToTurn > 2 && degreesToTurn < 180) {
 
-                            leftMotor.setPower(-.15);
-                            rightMotor.setPower(.15);
+                            leftMotor.setPower(.15);
+                            rightMotor.setPower(-.15);
                             adjust = false;
 
 
                         } else if (degreesToTurn < 358 && degreesToTurn > 180) {
 
-                            leftMotor.setPower(.15);
-                            rightMotor.setPower(-.15);
+                            leftMotor.setPower(-.15);
+                            rightMotor.setPower(.15);
                             adjust = false;
 
                         } else if ((degreesToTurn >= 358 || degreesToTurn <= 2)) {
@@ -177,7 +177,7 @@ public class VuforiaOPBlue extends LinearOpMode {
                         else{
                             rightMotor.setPower(0);
                             leftMotor.setPower(0);
-                            distanceAdjust /= 2;
+                            distanceAdjust /= 3;
                             state = 0;
                             adjust = false;
                         }
@@ -224,15 +224,15 @@ public class VuforiaOPBlue extends LinearOpMode {
                     if (state == 6){
                         leftMotor.setPower(-5);
                         rightMotor.setPower(-5);
-                        Thread.sleep(500);
+                        Thread.sleep(300);
                         leftMotor.setPower(0);
                         rightMotor.setPower(0);
                         state = 7;
                     }
 
                     if (state == 7){
-                        shooterLeft.setPower(1);
-                        shooterRight.setPower(1);
+                        shooterLeft.setPower(.9);
+                        shooterRight.setPower(.9);
                         Thread.sleep(2000);
                         conveyor.setPower(-1);
                         Thread.sleep(3000);
