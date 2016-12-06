@@ -58,7 +58,7 @@ public class VuforiaOPRed extends LinearOpMode {
 
 
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-        params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        params.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         params.vuforiaLicenseKey = "ATL2vJ3/////AAAAGZZx51v2h0D2kh6vX9dkEVwwXavfMtPW74LnE7NWXWw2NChN8Td99tPKhECwV61l/fTsgxV43ktU6XBUlR9lZn1Z3BEd7nQPD+s4uscCWDSjTpXDdQZZWVD7Cfmp+ZK8ax49W55s1vC6mX3vED8miPeegc8DR1bT2BtjxLa0cD77nbeVN5ztUzZEGKPTZEhxGoxjqQsKOEUktyLo6NZIRTA5uEhOmVuwVWC1Iq49tfbjKnLe7t1qfzQlB6wri9DPUrtt3YeuyrNERLclghW7fz7GrfWooMfQIaNEbu/E7BhY95CDGy/Srl1ZpvingaBdcfpB7MAQ/+bFw93saY/lYwT7MXu9ctO9zv1rmuFEAJFp";
         params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
 
@@ -99,6 +99,7 @@ public class VuforiaOPRed extends LinearOpMode {
 
 
         if(hardCode){
+            beaconServo.setPosition(.5);
             telemetry.addData("Status", "Resetting Encoders");    //
             telemetry.update();
             leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -110,9 +111,9 @@ public class VuforiaOPRed extends LinearOpMode {
                     leftMotor.getCurrentPosition(),
                     rightMotor.getCurrentPosition());
             telemetry.update();
-            encoderDrive(DRIVE_SPEED, 25, 25, 6.0);  // S1: Forward 47 Inches with 5 Sec timeout
-            encoderDrive(TURN_SPEED, 14.8, -14.8, 1.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-            encoderDrive(DRIVE_SPEED, 12, 12, 1.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+            encoderDrive(DRIVE_SPEED, 35, 35, 7.0);  // S1: Forward 47 Inches with 5 Sec timeout
+//            encoderDrive(TURN_SPEED, 14.8, -14.8, 1.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+//            encoderDrive(DRIVE_SPEED, 12, 12, 1.0);  // S3: Reverse 24 Inches with 4 Sec timeout
 
             hardCode = false;
         }
@@ -185,7 +186,7 @@ public class VuforiaOPRed extends LinearOpMode {
                     if (state == 2){
                         rightMotor.setPower(5);
                         leftMotor.setPower(5);
-                        Thread.sleep(850);
+                        Thread.sleep(650);
                         rightMotor.setPower(0);
                         leftMotor.setPower(0);
                         state = 3;
