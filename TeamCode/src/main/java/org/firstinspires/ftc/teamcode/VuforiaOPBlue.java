@@ -100,7 +100,7 @@ public class VuforiaOPBlue extends LinearOpMode {
 
 
         if(hardCode == true){
-            beaconServo.setPosition(.5);
+            beaconServo.setPosition(.41);
             telemetry.addData("Status", "Resetting Encoders");    //
             telemetry.update();
             leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

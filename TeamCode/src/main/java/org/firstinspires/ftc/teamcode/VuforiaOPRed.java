@@ -99,7 +99,7 @@ public class VuforiaOPRed extends LinearOpMode {
 
 
         if(hardCode){
-            beaconServo.setPosition(.5);
+            beaconServo.setPosition(.41);
             telemetry.addData("Status", "Resetting Encoders");    //
             telemetry.update();
             leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -111,9 +111,9 @@ public class VuforiaOPRed extends LinearOpMode {
                     leftMotor.getCurrentPosition(),
                     rightMotor.getCurrentPosition());
             telemetry.update();
-            encoderDrive(DRIVE_SPEED, 35, 35, 7.0);  // S1: Forward 47 Inches with 5 Sec timeout
-//            encoderDrive(TURN_SPEED, 14.8, -14.8, 1.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-//            encoderDrive(DRIVE_SPEED, 12, 12, 1.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+            encoderDrive(DRIVE_SPEED, 35, 35, 7.3);  // S1: Forward 47 Inches with 5 Sec timeout
+            encoderDrive(TURN_SPEED, 40.0, -40.0, 2.4);  // S2: Turn Right 12 Inches with 4 Sec timeout
+            encoderDrive(DRIVE_SPEED, 18, 18, 2.7);  // S3: Reverse 24 Inches with 4 Sec timeout
 
             hardCode = false;
         }
